@@ -114,10 +114,22 @@ elif page == "نتيجتي وخطتي":
         for col,(key,path) in zip(cols,PATHS.items()):
             with col: col.metric(path["title"],f'{scores[key]}%',f'{result["raw"][key]["correct"]} من 5 إجابات صحيحة')
         st.markdown("### تحليل شجرة القرار")
-        st.markdown(f'<div class="panel"><div class="kicker">MODEL OUTPUT</div><h2>{PATHS[result["prediction"]]["title"]}</h2><p class="muted">هذا المجال هو أولوية التدريب المقترحة بناءً على درجات المجالات الثلاثة وعدد الإجابات غير الصحيحة.</p><span class="tag">ثقة النموذج: {result["confidence"]*100:.1f}%</span></div>', unsafe_allow_html=True)
+        prediction_map = {
+                           "التصيد الإلكتروني": "phishing",
+                            "حماية الخصوصية": "privacy",
+                             "كلمات المرور": "passwords"
+                         }
+
+        prediction_key = prediction_map.get(result["prediction"], result["prediction"])
+        path = PATHS[prediction_key]
+
+        st.markdown(
+                     f'<div class="panel"><div class="kicker">MODEL OUTPUT</div><h2>{path["title"]}</h2><p class="muted">هذا المجال هو أولوية التدريب المقترحة بناءً على درجات المجالات الثلاثة وعدد الإجابات غير الصحيحة.</p><span class="tag">ثقة النموذج: {result["confidence"]*100:.1f}%</span></div>',
+                     unsafe_allow_html=True
+                      )
         st.caption("درجة الثقة هي احتمال النموذج للفئة المختارة ضمن الفئات التي تعلمها؛ لا تعني احتمالًا طبيًا أو حكمًا قطعيًا على المتعلم.")
         st.markdown("### توصياتك")
-        rec=PATHS[result["prediction"]]
+        rec = path
         for item in rec["recommendations"]: st.markdown(f"- {item}")
         st.markdown("### الخطوة التالية")
         st.write(rec["next_step"])
